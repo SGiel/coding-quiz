@@ -1,6 +1,10 @@
-//var quizInfoEl = document.querySelector("#quiz-info");
+var quizInfoEl = document.querySelector("#quiz-info");
 var quizEl = document.querySelector("#quiz-container");
 var refreshWindowEl = document.querySelector("#refresh-window");
+var startQuizBtnEl = document.querySelector("#start-quiz-btn");
+var questionIndex = 0;
+
+
 var userInfo = {
     userInitials: "",
     userScore: 0
@@ -61,7 +65,6 @@ var testInfo = {
 
 var refresh = function (idToRefresh) {
     idToRefresh.innerHTML='';
-
 }
 
 // prompts for user initials
@@ -74,38 +77,60 @@ var userPrompt = function() {
     };
 };
 
+// gets answer from question after submit button hit
+var getAnswer = function(event) {
+    event.preventDefault();
+    var answerA = document.getElementById("answer-a").checked;
+    var answerB = document.getElementById("answer-b").checked;
+    var answerC = document.getElementById("answer-c").checked;
+    console.log(answerA, answerB, answerC);
+    //console.log("form data ", formData);
+    if (!(answerA || answerB || answerC)) {
+        window.alert("You need to submit an answer");
+    } else if (questionIndex < testInfo.testQuestions.length) {
+        questionIndex++;
+    } else {
+        return;
+    }
+    console.log(questionIndex);
+    startQuiz(event);
+}
+
 // puts test questions into form in HTML
-var createTestQuestions = function(index) {
-   
-   
+var createTestQuestions = function(event,index) {
+
+    event.preventDefault();
 
     // create div container to hold question and form
+   
     var containerEl = document.createElement("div");
     containerEl.className = "question-container";
 
-    quizEl.appendChild(containerEl);
-
+    refreshWindowEl.appendChild(containerEl);
+    
     // create question in h3
     var questionEl = document.createElement("h3");
     questionEl.className = "question";
     questionEl.textContent = testInfo.testQuestions[index];
 
+    containerEl.appendChild(questionEl);
 
     // create form that will contain questions
     var formEl = document.createElement("form");
-    formEl.className = "question-form";
+    formEl.id = "question-form";
+
+    containerEl.appendChild(formEl);
 
     var answerArray = ['a', 'b', 'c'];
-    console.log(answerArray);
     
     for (j = 0; j < answerArray.length; j++) {
        
          // create radio button for answer A
         var answerEl = document.createElement("input");
         answerEl.type = "radio";
-        answerEl.id = "answer-" + answerArray[j].value;
+        answerEl.id = "answer-" + answerArray[j];
         answerEl.name = "question" + (index+1).toString();
-        answerEl.value = "answer-" + answerArray[j].value;
+        answerEl.value = "answer-" + answerArray[j];
 
         var answerLabelEl = document.createElement("label");
         answerLabelEl.for = "question" + (index+1).toString();
@@ -113,31 +138,45 @@ var createTestQuestions = function(index) {
  
         var breakEl = document.createElement("br");
 
-        console.log(answerEl, answerLabelEl);
+        //console.log(answerEl, answerLabelEl);
 
         formEl.append(answerEl, answerLabelEl, breakEl);
     } 
+   
+    var submitContainerEl = document.createElement("span");
+    submitContainerEl.id = "button-container";
 
-    var submitEl = document.createElement("label");
-    submitEl.type = "submit";
-    submitEl.textContent = "Submit";
+    formEl.appendChild(submitContainerEl);
+  
+    containerEl.appendChild(formEl);
 
-    containerEl.append(questionEl,formEl, submitEl);
-
+    document.getElementById("button-container").innerHTML = '<button id="submit-answer-btn" onclick="getAnswer(event)">Submit</button>';
+    
 };
 
+var startTimer = function () {
+    refresh(refreshWindowEl);
+    var seconds = document.getElementById("countdown").textContent;
+    var countdown = setInterval(function() {
+        seconds--;
+        document.getElementById("countdown").textContent = seconds;
+    if (seconds <= 0) clearInterval(countdown);
+    }, 1000);    
+}
 
 var startQuiz = function(event) {
+    
+    startTimer();
+    event.preventDefault();
     refresh(refreshWindowEl);
-    for (i=0 ; i < testInfo.testQuestions.length; i++) {
-        //event.preventDefault();
-        //document.body.innerHTML = '';
-        createTestQuestions(i);
-    }
+    createTestQuestions(event,questionIndex);
     
 };
 
 
 userPrompt();
 
-quizEl.addEventListener("click", startQuiz);
+startQuizBtnEl.addEventListener("click", startQuiz);
+
+
+

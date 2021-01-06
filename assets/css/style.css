@@ -2,10 +2,6 @@
     box-sizing: border-box;
 }
 
-main {
-    font-family:'Courier New', Courier, monospace;
-}
-
 main p, main span {
     font-size: 18px;
     width: 100%;
@@ -46,23 +42,19 @@ main p, main span {
     font-size: 18px;
 }
 
-/*
-.question-container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column; 
-}
-*/
-.question-form {
+#question-form {
     display: block;
- 
-    /* justify-content: left; */
-    /* padding-left: 20px; */
-    /* text-align: left; */
-    /*
-    justify-content: center;
-    flex-direction: column;
-    */
+}
+
+#submit-answer-btn {
+    border: 1px solid  rgb(32, 32, 114);
+    height: 40px;
+    width: 60px;
+    background-color: rgb(32, 32, 114);
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+    text-decoration: none;
 }
 
 #start-info {
