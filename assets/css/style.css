@@ -11,7 +11,7 @@ main p, main span {
     width: 100%;
 }
 
-header {
+#quiz-container {
     display: inline-block;
     border: 2px solid black;
     text-align: center;
@@ -44,6 +44,25 @@ header {
 #link-to-high-scores button:hover {
     color: rgb(102, 6, 102);
     font-size: 18px;
+}
+
+/*
+.question-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column; 
+}
+*/
+.question-form {
+    display: block;
+ 
+    /* justify-content: left; */
+    /* padding-left: 20px; */
+    /* text-align: left; */
+    /*
+    justify-content: center;
+    flex-direction: column;
+    */
 }
 
 #start-info {
