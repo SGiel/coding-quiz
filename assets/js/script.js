@@ -2,8 +2,9 @@ var quizInfoEl = document.querySelector("#quiz-info");
 var quizEl = document.querySelector("#quiz-container");
 var refreshWindowEl = document.querySelector("#refresh-window");
 var startQuizBtnEl = document.querySelector("#start-quiz-btn");
-var questionIndex = 0;
 
+var seconds = document.getElementById("countdown").textContent;
+var questionIndex = 0;
 
 var userInfo = {
     userInitials: "",
@@ -13,58 +14,36 @@ var userInfo = {
 var testInfo = {
     testQuestions: ["Question 1", 
                     "Question 2", 
-                    "Question 3", 
-                    "Question 4", 
-                    "Question 5", 
-                    "Question 6", 
-                    "Question 7", 
-                    "Question 8", 
-                    "Question 9", 
-                    "Question 10"],
+                    "Question 3"],
     testAnswerA: ["Question 1 Answer A", 
                     "Question 2 Answer A", 
-                    "Question 3 Answer A", 
-                    "Question 4 Answer A", 
-                    "Question 5 Answer A", 
-                    "Question 6 Answer A", 
-                    "Question 7 Answer A", 
-                    "Question 8 Answer A", 
-                    "Question 9 Answer A", 
-                    "Question 10 Answer A"],
+                    "Question 3 Answer A"],
     testAnswerB: ["Question 1 Answer B", 
                     "Question 2 Answer B", 
-                    "Question 3 Answer B", 
-                    "Question 4 Answer B", 
-                    "Question 5 Answer B", 
-                    "Question 6 Answer B", 
-                    "Question 7 Answer B", 
-                    "Question 8 Answer B", 
-                    "Question 9 Answer B", 
-                    "Question 10 Answer B"],
+                    "Question 3 Answer B"],
     testAnswerC: ["Question 1 Answer C", 
                     "Question 2 Answer C", 
-                    "Question 3 Answer C", 
-                    "Question 4 Answer C", 
-                    "Question 5 Answer C", 
-                    "Question 6 Answer C", 
-                    "Question 7 Answer C", 
-                    "Question 8 Answer C", 
-                    "Question 9 Answer C", 
-                    "Question 10 Answer C"],
-    testAnswerActual: ["Answer 1",
-                    "Answer 2",
-                    "Answer 3",
-                    "Answer 4",
-                    "Answer 5",
-                    "Answer 6",
-                    "Answer 7",
-                    "Answer 8",
-                    "Answer 9",
-                    "Answer 10"]
+                    "Question 3 Answer C"],
+    testAnswerUser: ["",
+                    "",
+                    ""],
+    testAnswerActual: ["a",
+                    "b",
+                    "c"]
 };
 
 var refresh = function (idToRefresh) {
     idToRefresh.innerHTML='';
+}
+
+var createClearWindow = function () {
+
+    var containerEl = document.createElement("div");
+    containerEl.className = "window-container";
+
+    refreshWindowEl.appendChild(containerEl);
+
+    return containerEl;
 }
 
 // prompts for user initials
@@ -77,41 +56,120 @@ var userPrompt = function() {
     };
 };
 
-// gets answer from question after submit button hit
+// checks user answer against actual answer and checks if out of time for answer
+var checkAnswer = function() {
+    if (testInfo.testAnswerActual[questionIndex] === testInfo.testAnswerUser[questionIndex] & seconds>0) {
+        return true;
+    } else  if (seconds<=0) {
+        endQuiz();
+    } else {
+        return false;
+    }
+}
+
+// if user answer correct; adds 1 to score, if user answer incorrect subtracts 1 from 
+// score and subtracts 10 seconds from timer
+var keepScore = function(correct) {
+    switch (correct) {
+        case true:
+            userInfo.userScore++;
+            window.alert("Correct! Score = " + userInfo.userScore);
+            break;
+        case false:
+            seconds -= 10;
+            window.alert("Inorrect. 10 seconds have been deducted from your time. Score = " + userInfo.userScore);
+            break;
+        default:
+          console.log("Something went wrong!");
+      }
+}
+
+var endQuiz = function () {
+    var quizFinish = true;
+    finalTime = seconds; 
+    // if the time <=0 and the last question hasn't been answered then the quiz wasn't finished
+    if (seconds<=0 & !testInfo.testAnswerUser[9]) {
+        seconds = 0;
+        quizFinish = false;
+    } 
+    // saves the time before refreshWindow sets it back to 0
+    
+    refresh(refreshWindowEl);
+
+    // create div container in a cleared out window to end of quiz info
+    var containerEl = createClearWindow();
+
+    var quizEndMessageEl = document.createElement("h1");
+    if (quizFinish) { 
+        quizEndMessageEl.textContent = "End of Quiz!"; 
+    }
+    else { 
+        quizEndMessageEl.textContent = "Time is up!"
+    }
+
+    containerEl.appendChild(quizEndMessageEl);
+
+    var quizSummaryEl = document.createElement("h2");
+    quizSummaryEl.textContent = "You had a score of " + userInfo.userScore + " and finished with " + finalTime + " seconds to spare";
+    containerEl.appendChild(quizSummaryEl);
+
+}
+
+// gets answer user chose for question after submit button hit (radio button chosen)
 var getAnswer = function(event) {
     event.preventDefault();
+
+    // checks which answer the user chose
     var answerA = document.getElementById("answer-a").checked;
     var answerB = document.getElementById("answer-b").checked;
     var answerC = document.getElementById("answer-c").checked;
-    console.log(answerA, answerB, answerC);
-    //console.log("form data ", formData);
+
+    // correct notes whether the user got the answer correct
+    var correct;
+
+    // puts the user answer in the testInfo object
+    if (answerA) {
+        testInfo.testAnswerUser[questionIndex] = "a";
+    } else if (answerB){
+        testInfo.testAnswerUser[questionIndex] = "b";
+    } else if (answerC) {
+        testInfo.testAnswerUser[questionIndex] = "c";
+    } else {
+          console.log("Something went wrong!");
+      }
+   
+    // checks if a radio box has been chosen
     if (!(answerA || answerB || answerC)) {
         window.alert("You need to submit an answer");
-    } else if (questionIndex < testInfo.testQuestions.length) {
+    } else if (questionIndex < (testInfo.testQuestions.length)) {
+        // checks the user answer against the actual answer
+        correct = checkAnswer(questionIndex);
+        keepScore(correct);
         questionIndex++;
+    } 
+
+    // go back to the quiz for next question
+    if (questionIndex < (testInfo.testQuestions.length) & seconds > 0) {
+        startQuiz(event);
+    // end of quiz
     } else {
-        return;
+        endQuiz();
     }
-    console.log(questionIndex);
-    startQuiz(event);
+// end of getAnswer function
 }
 
 // puts test questions into form in HTML
-var createTestQuestions = function(event,index) {
+var createTestQuestions = function(event) {
 
     event.preventDefault();
 
-    // create div container to hold question and form
-   
-    var containerEl = document.createElement("div");
-    containerEl.className = "question-container";
-
-    refreshWindowEl.appendChild(containerEl);
+    // create div container in a cleared out window to hold question and form
+    var containerEl = createClearWindow();
     
     // create question in h3
     var questionEl = document.createElement("h3");
     questionEl.className = "question";
-    questionEl.textContent = testInfo.testQuestions[index];
+    questionEl.textContent = testInfo.testQuestions[questionIndex];
 
     containerEl.appendChild(questionEl);
 
@@ -123,54 +181,68 @@ var createTestQuestions = function(event,index) {
 
     var answerArray = ['a', 'b', 'c'];
     
-    for (j = 0; j < answerArray.length; j++) {
+    // create radio buttons for answers A, B and C as loop through answerArray
+    for (j = 0; j < (answerArray.length); j++) {
        
-         // create radio button for answer A
         var answerEl = document.createElement("input");
+        var answerLabelEl = document.createElement("label");
+
+        // creates radio buttons A, B and  C
         answerEl.type = "radio";
         answerEl.id = "answer-" + answerArray[j];
-        answerEl.name = "question" + (index+1).toString();
+        answerEl.name = "question" + (questionIndex+1).toString();
         answerEl.value = "answer-" + answerArray[j];
 
-        var answerLabelEl = document.createElement("label");
-        answerLabelEl.for = "question" + (index+1).toString();
-        answerLabelEl.textContent = eval('testInfo.testAnswer' + answerArray[j].toUpperCase() + '[index]');
- 
+        // creates labels for the radio buttons A, B and C
+        answerLabelEl.for = "question" + (questionIndex+1).toString();
+        answerLabelEl.textContent = eval('testInfo.testAnswer' + answerArray[j].toUpperCase() + '[questionIndex]');
+        
+        // break puts buttons on different lines
         var breakEl = document.createElement("br");
 
-        //console.log(answerEl, answerLabelEl);
-
+        // puts the answer choices (radio buttons and labels) into the html
         formEl.append(answerEl, answerLabelEl, breakEl);
     } 
    
-    var submitContainerEl = document.createElement("span");
-    submitContainerEl.id = "button-container";
+    // creates submit button for each question
+    var submitBtnEl = document.createElement("button")
+    submitBtnEl.id = "submit-answer-btn";
+    // the onclick for the submit button calls the getAnswer function which will
+    // also create each of the new question -- this onclick is the listening event for
+    // the submit button on the questions
+    submitBtnEl.setAttribute("onclick", "getAnswer(event)");
+    submitBtnEl.textContent = "Submit";
 
-    formEl.appendChild(submitContainerEl);
-  
+    // puts the submit button into the form
+    formEl.append(submitBtnEl);
+
+    // puts the form into the container
     containerEl.appendChild(formEl);
-
-    document.getElementById("button-container").innerHTML = '<button id="submit-answer-btn" onclick="getAnswer(event)">Submit</button>';
-    
+// end of createTestQuestions function
 };
 
 var startTimer = function () {
-    refresh(refreshWindowEl);
-    var seconds = document.getElementById("countdown").textContent;
     var countdown = setInterval(function() {
         seconds--;
+        if (seconds <= 0) {
+            clearInterval(countdown);
+            seconds = 0;
+        }
         document.getElementById("countdown").textContent = seconds;
-    if (seconds <= 0) clearInterval(countdown);
     }, 1000);    
 }
 
 var startQuiz = function(event) {
-    
-    startTimer();
     event.preventDefault();
+    // only start timer at first question
+    if (questionIndex === 0) {
+        startTimer();
+    } 
+   
+    // clears out window for fresh question
     refresh(refreshWindowEl);
-    createTestQuestions(event,questionIndex);
-    
+    // creates questions one at a time based on array monitored by questionIndex
+    createTestQuestions(event);    
 };
 
 
