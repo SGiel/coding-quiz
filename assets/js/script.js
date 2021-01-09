@@ -3,6 +3,7 @@ var quizEl = document.querySelector("#quiz-container");
 var refreshWindowEl = document.querySelector("#refresh-window");
 var startQuizBtnEl = document.querySelector("#start-quiz-btn");
 var saveHighScoreBtnEl = document.querySelector("#save-high-score-btn");
+var linkToHighScoresEl = document.querySelector("#link-to-high-scores");
 
 var seconds = document.getElementById("countdown").textContent;
 var questionIndex = 0;
@@ -37,6 +38,27 @@ var testInfo = {
                     "c"]
 };
 
+// presents high scores when user clicks button
+var seeHighScores = function() {
+    var savedHighScores = localStorage.getItem("highScores");
+    //var scoreListEl = document.createElement("p");
+    var highScoresList = '';
+    if (!savedHighScores) {
+        alert('there are no high scores yet.')
+        //linkToHighScoresEl.appendChild(scoreListEl);
+
+    } else {
+        savedHighScores = JSON.parse(savedHighScores);
+        for (i = 0; i< savedHighScores.length; i++ ){
+            highScoresList += savedHighScores[i].userInitials + " " + savedHighScores[i].userScore + "; ";
+        }
+        alert('High Scores: ' + highScoresList);
+        //linkToHighScoresEl.appendChild(scoreListEl);
+    }
+
+    
+
+}
 var refresh = function (idToRefresh) {
     idToRefresh.innerHTML='';
 }
@@ -337,10 +359,4 @@ userPrompt();
 
 startQuizBtnEl.addEventListener("click", startQuiz);
 
-//saveHighScoreBtnEl.addEventListener("click", highScoreInfo);
-
-//console.log(saveHighScoreBtnEl);
-//console.log(saveHighScoreBtnEl);
-
-
-
+linkToHighScoresEl.addEventListener("click", seeHighScores);
