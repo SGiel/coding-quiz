@@ -17,7 +17,7 @@ This JavaScript code contains skills I recently learned including accessing loca
 
 ![Screenshot of web applicaton high-scores list](assets/images/coding-quiz-with-high-scores.png)
 
-![Screenshot of web applicaton end of quiz with high score](assets/images/coding-end-of-quiz.png)
+![Screenshot of web applicaton end of quiz with high score](assets/images/coding-quiz-end-of-quiz.png)
 
 
 
