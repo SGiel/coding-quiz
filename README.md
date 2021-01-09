@@ -23,7 +23,7 @@ This JavaScript code contains skills I recently learned including accessing loca
 
 ## Link
 
-[Link to Stephanie's Password Generator web applicaton](https://sgiel.github.io/coding-quiz/)
+[Link to Stephanie's Coding Quiz applicaton](https://sgiel.github.io/coding-quiz/)
 
 
 
