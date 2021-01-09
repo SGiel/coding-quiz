@@ -2,13 +2,18 @@ var quizInfoEl = document.querySelector("#quiz-info");
 var quizEl = document.querySelector("#quiz-container");
 var refreshWindowEl = document.querySelector("#refresh-window");
 var startQuizBtnEl = document.querySelector("#start-quiz-btn");
+var saveHighScoreBtnEl = document.querySelector("#save-high-score-btn");
 
 var seconds = document.getElementById("countdown").textContent;
 var questionIndex = 0;
 
+// user initials and high scores will be saved in highScores
+var highScores = [];
+
 var userInfo = {
     userInitials: "",
-    userScore: 0
+    userScore: 0,
+    isUserHighScore: false
 };
 
 var testInfo = {
@@ -49,16 +54,17 @@ var createClearWindow = function () {
 // prompts for user initials
 var userPrompt = function() {
     // to accomodate all name types only an empty string is rejected as name initials
-    userInfo.Initials = window.prompt("Welcome to your Code Quiz Challenge! Please enter your initials.");
-    if (!userInfo.Initials) {
+    userInfo.userInitials = window.prompt("Welcome to your Code Quiz Challenge! Please enter your initials.");
+    if (!userInfo.userInitials) {
         window.alert("You have not entered anything. Please try again.");
         userPrompt();
     };
+   
 };
 
 // checks user answer against actual answer and checks if out of time for answer
 var checkAnswer = function() {
-    if (testInfo.testAnswerActual[questionIndex] === testInfo.testAnswerUser[questionIndex] & seconds>0) {
+    if (testInfo.testAnswerActual[questionIndex] === testInfo.testAnswerUser[questionIndex] && seconds>0) {
         return true;
     } else  if (seconds<=0) {
         endQuiz();
@@ -84,20 +90,100 @@ var keepScore = function(correct) {
       }
 }
 
+var saveHighScore = function(event) {
+    
+    if (userInfo.isUserHighScore) {
+        var saveHighScorePrmpt = window.confirm("I would like to save my high score!");
+        if (saveHighScorePrmpt) {
+            //saves highScores to local Storage
+            localStorage.setItem("highScores", highScores);
+        }
+    }
+// end of saveHighScore function
+}
+
+// checking if this is the user's high score
+var checkHighScores = function() {
+    // get high scores array saved on LocalStorage
+    var savedHighScores = localStorage.getItem("highScores");
+    var updatedSavedHighScores = [];
+
+    // oldUser initialized to -1 if new user, otherwise location of old high score in local Storage
+    var newUser = true;
+
+    // check first if highScores has anything saved in it
+    if (savedHighScores) {
+        savedHighScores = JSON.parse(savedHighScores);
+        for (i = 0; i < savedHighScores.length; i++) {
+
+            // if user left initials it checks against other scores
+            if ((savedHighScores[i].userInitials === userInfo.userInitials) && (userInfo.userScore > savedHighScores[i].userScore)) {
+                userInfo.isUserHighScore = true;
+                newUser = false;
+                savedHighScores[i].userScore = userInfo.userScore;
+                highScores = JSON.stringify(savedHighScores);
+            } 
+        }
+        // if user hasn't left initials yet then it is the high score
+        if (newUser === true) {
+            userInfo.isUserHighScore = true;
+            savedHighScores.push(userInfo);
+            highScores = JSON.stringify(savedHighScores);
+        }
+    // if nothing saved for any user, the score they currently have is high score
+    } else {
+        userInfo.isUserHighScore = true;
+        // first time needed array declaration
+        updatedSavedHighScores[0] = userInfo;
+        highScores = JSON.stringify(updatedSavedHighScores);
+    }
+
+// end of checkHighScore function
+}
+
+// puts the high score info on the page if user achieved a high score
+var highScoreInfo = function (containerEl) {
+
+    // check if user had high score and temporarily save in highScores array
+    // knowing user can decide to not store in localStorage
+    checkHighScores();
+
+    if (userInfo.isUserHighScore) {
+        var quizHighScoreEl = document.createElement("h2");
+        quizHighScoreEl.textContent = "This is your high Score!";
+        containerEl.appendChild(quizHighScoreEl);
+
+        var saveHighScoreBtn = document.createElement("button");
+        saveHighScoreBtn.id = 'save-high-score-btn';
+        saveHighScoreBtn.type = "button";
+        saveHighScoreBtn.textContent = "Save My High Score!";   
+
+        // saveHighScore function called if user clicks button to save high score
+        saveHighScoreBtn.setAttribute("onclick", "saveHighScore(event)");
+        containerEl.appendChild(saveHighScoreBtn);
+    }
+// end of highScoreInfo function
+}
+
 var endQuiz = function () {
+
+    // initializes that user finished quiz to true;
     var quizFinish = true;
-    finalTime = seconds; 
+    
     // if the time <=0 and the last question hasn't been answered then the quiz wasn't finished
-    if (seconds<=0 & !testInfo.testAnswerUser[9]) {
+    if (seconds<=0 && !testInfo.testAnswerUser[9]) {
         seconds = 0;
         quizFinish = false;
-    } 
-    // saves the time before refreshWindow sets it back to 0
-    
+    } else if (seconds<=0) {
+        seconds = 0;
+    }
+   
+    // clears out window so can put quiz results up
     refresh(refreshWindowEl);
-
+    
     // create div container in a cleared out window to end of quiz info
     var containerEl = createClearWindow();
+    containerEl.id = "quiz-summary";
 
     var quizEndMessageEl = document.createElement("h1");
     if (quizFinish) { 
@@ -110,9 +196,12 @@ var endQuiz = function () {
     containerEl.appendChild(quizEndMessageEl);
 
     var quizSummaryEl = document.createElement("h2");
-    quizSummaryEl.textContent = "You had a score of " + userInfo.userScore + " and finished with " + finalTime + " seconds to spare";
+    quizSummaryEl.textContent = userInfo.userInitials + " has a score of " + userInfo.userScore + " and finished with " + seconds + " seconds to spare";
     containerEl.appendChild(quizSummaryEl);
 
+    highScoreInfo(containerEl);
+
+// end of endQuiz function
 }
 
 // gets answer user chose for question after submit button hit (radio button chosen)
@@ -134,10 +223,8 @@ var getAnswer = function(event) {
         testInfo.testAnswerUser[questionIndex] = "b";
     } else if (answerC) {
         testInfo.testAnswerUser[questionIndex] = "c";
-    } else {
-          console.log("Something went wrong!");
-      }
-   
+    }   
+
     // checks if a radio box has been chosen
     if (!(answerA || answerB || answerC)) {
         window.alert("You need to submit an answer");
@@ -149,7 +236,7 @@ var getAnswer = function(event) {
     } 
 
     // go back to the quiz for next question
-    if (questionIndex < (testInfo.testQuestions.length) & seconds > 0) {
+    if (questionIndex < (testInfo.testQuestions.length) && seconds > 0) {
         startQuiz(event);
     // end of quiz
     } else {
@@ -249,6 +336,11 @@ var startQuiz = function(event) {
 userPrompt();
 
 startQuizBtnEl.addEventListener("click", startQuiz);
+
+//saveHighScoreBtnEl.addEventListener("click", highScoreInfo);
+
+//console.log(saveHighScoreBtnEl);
+//console.log(saveHighScoreBtnEl);
 
 
 
