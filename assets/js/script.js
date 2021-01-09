@@ -18,34 +18,41 @@ var userInfo = {
 };
 
 var testInfo = {
-    testQuestions: ["The Document Object Model is:", 
-                    "To select a class attribute in JavaScript:", 
-                    "Math.random() is a :",
-                    "The code to return the first element in a document with an id of \'pets\:'",
-                    "The code localStorage.getItem(\'myCat\', \'Tom\') is:"],
-    testAnswerA: ["a physical model of what you want your website to look like.", 
-                    "you need to add a dot (.) prefix to the class name.", 
-                    "JavaScript method.",
-                    "document.getAttribute(#pets)",
-                    "is using incorrect syntax."],
-    testAnswerB: ["the object representation of the webpage.", 
-                    "you need to say class=\'className\'", 
-                    "JavaScript function.",
-                    "getFirst(\'#pets\');]",
-                    "is putting the string \'Tom\' stored in LocalStorage into the variable myCat"],
-    testAnswerC: ["additional HTML that builds the webpage.", 
-                    "you need to add a # prefix to the class name.", 
-                    "mathematical operator in JavaScript.",
-                    "document.querySelector[\'#pets\'];",
-                    "is getting the strings \'Tom\' and \'cat\' from LocalStorage"],
+    testQuestions: ["String values must be enclosed within _______ when being assigned to variables", 
+                    "Commonly used data types DO NOT Include:", 
+                    "Arrays in JavaScript can be used to store",
+                    "The condition in an if / else statement is enclosed with _______",
+                    "A very useful tool during development and debugging for printing content to the debugger is"],
+    testAnswerA: ["commas", 
+                    "strings", 
+                    "numbers and strings",
+                    "quotes",
+                    "JavaScript"],
+    testAnswerB: ["curly brackets", 
+                    "booleans", 
+                    "other arrays",
+                    "curly brackets",
+                    "terminal/bash"],
+    testAnswerC: ["quotes", 
+                    "alerts", 
+                    "booleans",
+                    "parenthesis",
+                    "for loops"],
+    testAnswerD: ["parenthesis", 
+                    "numbers", 
+                    "all of the above",
+                    "square brackets",
+                    "console.log"],
     testAnswerUser: ["",
                     "",
+                    "",
+                    "",
                     ""],
-    testAnswerActual: ["b",
-                    "a",
-                    "b",
+    testAnswerActual: ["c",
                     "c",
-                    "a"]
+                    "d",
+                    "d",
+                    "d"]
 };
 
 // presents high scores when user clicks button
@@ -241,10 +248,19 @@ var endQuiz = function () {
 var getAnswer = function(event) {
     event.preventDefault();
 
+    console.log(event.Target);
+
     // checks which answer the user chose
-    var answerA = document.getElementById("answer-a").checked;
-    var answerB = document.getElementById("answer-b").checked;
-    var answerC = document.getElementById("answer-c").checked;
+    var answerA = document.getElementById("answer-a").clicked;
+    var answerB = document.getElementById("answer-b").clicked;
+    var answerC = document.getElementById("answer-c").clicked;
+    var answerD = document.getElementById("answer-d").clicked;
+
+    if (document.getElementById("answer-a").clicked == true) {
+        console.log("I am in")
+    }
+
+    console.log(answerA, answerB, answerC, answerD);
 
     // correct notes whether the user got the answer correct
     var correct;
@@ -256,7 +272,9 @@ var getAnswer = function(event) {
         testInfo.testAnswerUser[questionIndex] = "b";
     } else if (answerC) {
         testInfo.testAnswerUser[questionIndex] = "c";
-    }   
+    } else if (answerD) {
+        testInfo.testAnswerUser[questionIndex] = "d;"
+    }
 
     // checks if a radio box has been chosen
     if (!(answerA || answerB || answerC)) {
@@ -287,7 +305,7 @@ var createTestQuestions = function(event) {
     var containerEl = createClearWindow();
     
     // create question in h3
-    var questionEl = document.createElement("h3");
+    var questionEl = document.createElement("h2");
     questionEl.className = "question";
     questionEl.textContent = testInfo.testQuestions[questionIndex];
 
@@ -299,48 +317,31 @@ var createTestQuestions = function(event) {
 
     containerEl.appendChild(formEl);
 
-    var answerArray = ['a', 'b', 'c'];
+    var answerArray = ['a', 'b', 'c', 'd'];
     
     // create radio buttons for answers A, B and C as loop through answerArray
     for (j = 0; j < (answerArray.length); j++) {
         
-        var answerEl = document.createElement("input");
-        var answerLabelEl = document.createElement("label");
+        // creates  button for each question
+        var answerBtnWrapperEl = document.createElement("div");
+        answerBtnWrapperEl.id = "answer-button";
 
-        // creates radio buttons A, B and  C
-        answerEl.type = "radio";
-        answerEl.id = "answer-" + answerArray[j];
-        answerEl.name = "question" + (questionIndex+1).toString();
-        answerEl.value = "answer-" + answerArray[j];
-
-        // creates labels for the radio buttons A, B and C
-        answerLabelEl.for = "question" + (questionIndex+1).toString();
-        answerLabelEl.textContent = eval('testInfo.testAnswer' + answerArray[j].toUpperCase() + '[questionIndex]');
+        var answerBtnEl = document.createElement("button")
+        answerBtnEl.id = "answer-" + answerArray[j];
+        answerBtnEl.name = "answer-button";
         
-        // break puts buttons on different lines
-        var breakEl = document.createElement("br");
-
+        answerBtnEl.value = "answer-" + answerArray[j];
+        answerBtnEl.setAttribute("onclick", "getAnswer(event)");
+        answerBtnEl.textContent = eval('testInfo.testAnswer' + answerArray[j].toUpperCase() + '[questionIndex]');
 
         // puts the answer choices (radio buttons and labels) into the html
-        formEl.append(answerEl, answerLabelEl, breakEl);
+        answerBtnWrapperEl.appendChild(answerBtnEl);
+        formEl.appendChild(answerBtnWrapperEl);
     } 
-   
-    // creates submit button for each question
-    var submitBtnWrapperEl = document.createElement("div");
-    var submitBtnEl = document.createElement("button")
-    submitBtnEl.id = "submit-answer-btn";
-    // the onclick for the submit button calls the getAnswer function which will
-    // also create each of the new question -- this onclick is the listening event for
-    // the submit button on the questions
-    submitBtnEl.setAttribute("onclick", "getAnswer(event)");
-    submitBtnEl.textContent = "Submit";
-
-    submitBtnWrapperEl.appendChild(submitBtnEl);
-
-    // puts the submit button into the form
-    formEl.appendChild(submitBtnWrapperEl);
-    // puts the form into the container
-    containerEl.appendChild(formEl);
+    //console.log(formEl);
+    //var getAnswerBtn = formEl.querySelector("question-form");
+    //console.log("get Answer button:", getAnswerBtn);
+    //getAnswerBtn.addEventListener("click", getAnswer);
 // end of createTestQuestions function
 };
 
@@ -369,7 +370,7 @@ var startQuiz = function(event) {
 };
 
 
-userPrompt();
+// userPrompt();
 
 startQuizBtnEl.addEventListener("click", startQuiz);
 
