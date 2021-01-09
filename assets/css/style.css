@@ -2,9 +2,15 @@
     box-sizing: border-box;
 }
 
+main {
+    margin: 0 auto;
+    text-align: center;
+}
+
 main p, main span {
     font-size: 18px;
     width: 100%;
+    
 }
 
 #quiz-container {
@@ -12,7 +18,6 @@ main p, main span {
     border: 2px solid black;
     text-align: center;
     color: black;
-    text-align: center;
     width: 80%;
     height: 350px;
     padding: 20px 0 60px 0;
@@ -28,6 +33,7 @@ main p, main span {
     width: 100%;
 }
 
+
 #link-to-high-scores button {
     color: rgb(129, 38, 129);
     font-size: 16px;
@@ -35,6 +41,7 @@ main p, main span {
     text-decoration: none;
     background-color: white;
     width: 100%;
+    margin-top: 15px;
 }
 
 #link-to-high-scores button:hover {
@@ -42,18 +49,38 @@ main p, main span {
     font-size: 18px;
 }
 
+#refresh-window {
+    margin: 0 auto;
+}
+
+.window-container {
+    display: block;
+    text-align: center;
+    margin: 0 auto;
+    width: 50%; 
+}
+
 #question-form {
     display: block;
+    width: 90%;
+    text-align: left;
+    margin: 0 auto;
+}
+
+#question-form div button {
+    display: block;
+    margin: 10px auto;
 }
 
 #submit-answer-btn {
+    display: block;
     border: 1px solid  rgb(32, 32, 114);
     height: 40px;
     width: 60px;
     background-color: rgb(32, 32, 114);
     color: white;
     text-align: center;
-    margin-top: 10px;
+    margin-top: 10px auto;
     text-decoration: none;
 }
 
