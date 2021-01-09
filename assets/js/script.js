@@ -127,6 +127,7 @@ var saveHighScore = function(event) {
         if (saveHighScorePrmpt) {
             //saves highScores to local Storage
             localStorage.setItem("highScores", highScores);
+            alert("Your score has been saved!");
         }
     }
 // end of saveHighScore function
