@@ -33,7 +33,6 @@ main p, main span {
     width: 100%;
 }
 
-
 #link-to-high-scores button {
     color: rgb(129, 38, 129);
     font-size: 16px;
@@ -61,7 +60,7 @@ main p, main span {
     width: 80%; 
 }
 
-#window-container-test-questions {
+#window-container-test-questions, #window-container-high-scores {
     text-align: left;
 }
 
@@ -151,4 +150,38 @@ main p, main span {
     background-color: rgb(114, 114, 223);
     width: 110px;
     height: 55px;
+}
+
+#scores-list-container {
+    display: block;
+    border: 2px solid lightgrey;
+    background-color: lightgrey;
+    color: black;
+    text-align: left;
+}
+
+#button-wrapper {
+    display: flex;
+    justify-content: flex-start;
+}
+
+#go-back-btn, #clear-high-scores-btn {
+    border: 1px solid  rgb(32, 32, 114);
+    border-radius: 15px;
+    background-color: rgb(32, 32, 114);
+    color: white;
+    text-align: center;
+    text-decoration: none;
+    width: 125px;
+    height: 60px;
+    margin-right: 20px;
+    padding: 0;
+    font-size: 16px;
+    margin-top: 20px;
+}
+
+#go-back-btn:hover, #clear-high-scores-btn:hover {
+    background-color: rgb(114, 114, 223);
+    width: 130px;
+    height: 65px;
 }

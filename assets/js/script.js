@@ -114,15 +114,10 @@ var keepScore = function(correct) {
       }
 }
 
-var saveHighScore = function(event) {
-    
+var saveHighScore = function() {
     if (userInfo.isUserHighScore) {
-        var saveHighScorePrmpt = window.confirm("I would like to save my high score!");
-        if (saveHighScorePrmpt) {
             //saves highScores to local Storage
             localStorage.setItem("highScores", highScores);
-            alert("Your score has been saved!");
-        }
     }
 // end of saveHighScore function
 }
@@ -165,9 +160,90 @@ var checkHighScores = function() {
         updatedSavedHighScores[0] = userInfo;
         highScores = JSON.stringify(updatedSavedHighScores);
     }
-
+    saveHighScore();
+   
 // end of checkHighScore function
 }
+
+var startOver = function (event) {
+    location.reload();
+}
+
+var clearHighScores = function (event) {
+    event.preventDefault();
+    var clearHighScoreEl = document.querySelector("#saved-high-scores");
+    clearHighScoreEl.textContent = '';
+    //console.log("getElementById ", getElementById("#saved-high-scores"));
+    //document.getElementById("#saved-high-scores").innerHTML = "<p id='saved-high-scores'></p>";
+    window.alert("The high scores have been cleared.")
+    localStorage.clear();
+}
+
+// puts the high score info on the page if user achieved a high score
+var highScoreInfo = function () {
+    // check if user had high score and temporarily save in highScores array
+    // knowing user can decide to not store in localStorage
+    checkHighScores();
+
+    var savedHighScores = localStorage.getItem("highScores");
+
+    // clears out window so can put user high scores up
+    refresh(refreshWindowEl);
+    var containerEl = createClearWindow();
+    containerEl.id = 'window-container-high-scores';
+
+    var highScoreContainerEl = document.createElement("div");
+    
+    var highScoreEl = document.createElement("h2");
+    highScoreEl.textContent = "High scores";
+
+    highScoreContainerEl.appendChild(highScoreEl);
+
+   
+    var highScoreStrng = '';
+
+    if (savedHighScores) {
+        savedHighScores = JSON.parse(savedHighScores);
+        for (i = 0; i < savedHighScores.length; i++ ) {
+            if (i>0) { 
+                highScoreStrng += "; ";
+            }
+            highScoreStrng += (i+1).toString() + ". " + savedHighScores[i].userInitials + " - " + savedHighScores[i].userScore.toString();
+        }
+    }
+
+    scoresListDivEl = document.createElement("div");
+    scoresListDivEl.id = "scores-list-container";
+    scoresListEl = document.createElement("p");
+    scoresListEl.id = "saved-high-scores";
+    scoresListEl.textContent = highScoreStrng;
+
+    scoresListDivEl.appendChild(scoresListEl);
+
+    var buttonWrapperEl = document.createElement("div");
+    buttonWrapperEl.id = "button-wrapper";
+
+    var goBackBtnEl= document.createElement("button");    
+    goBackBtnEl.type = "submit";
+    goBackBtnEl.setAttribute("onclick", "startOver(event)");
+    goBackBtnEl.textContent = "Go back";
+    goBackBtnEl.id = "go-back-btn";
+
+    var clearHighScoresBtnEl = document.createElement("button");
+    clearHighScoresBtnEl.type = "submit";
+    clearHighScoresBtnEl.setAttribute("onclick", "clearHighScores(event)");
+    clearHighScoresBtnEl.textContent = "Clear high scores";
+    clearHighScoresBtnEl.id = "clear-high-scores-btn";
+
+    buttonWrapperEl.append(goBackBtnEl, clearHighScoresBtnEl);
+
+    highScoreContainerEl.append(scoresListDivEl, buttonWrapperEl);
+
+    containerEl.appendChild(highScoreContainerEl);
+    
+// end of highScoreInfo function
+}
+
 var clearFooterAnswer = function () {
     var answerRevealedEl = document.querySelector("#answer-reveal");
     answerRevealedEl.textContent = '';
@@ -192,35 +268,7 @@ var answerReveal = function(correct) {
     if (questionIndex === 0) {
         quizContainerEl.appendChild(answerRevealEl);
     } 
-    
-}
-
-// puts the high score info on the page if user achieved a high score
-var highScoreInfo = function () {
-
-    // check if user had high score and temporarily save in highScores array
-    // knowing user can decide to not store in localStorage
-    checkHighScores();
-
-    // clears out window so can put quiz results up
-    refresh(refreshWindowEl);
-
-    if (userInfo.isUserHighScore) {
-        var quizHighScoreEl = document.createElement("h2");
-        quizHighScoreEl.textContent = "This is your high Score!";
-        endQuizContainerEl.appendChild(quizHighScoreEl);
-
-        var saveHighScoreBtn = document.createElement("button");
-        saveHighScoreBtn.id = 'save-high-score-btn';
-        saveHighScoreBtn.type = "button";
-        saveHighScoreBtn.textContent = "Save My High Score!";   
-
-        // saveHighScore function called if user clicks button to save high score
-        saveHighScoreBtn.setAttribute("onclick", "saveHighScore(event)");
-        endQuizContainerEl.appendChild(saveHighScoreBtn);
-    }
-    
-// end of highScoreInfo function
+// end of answerReveal function    
 }
 
 var storeUserInitials = function(event) {
@@ -229,6 +277,7 @@ var storeUserInitials = function(event) {
     userInfo.userInitials = document.getElementById("initials-input").value;
 
     highScoreInfo();
+// end of storeUserIntials function
 }
 
 // prompts for user initials as a form with a submit button
@@ -257,7 +306,8 @@ var getUserInitials = function(endQuizContainerEl) {
     
     createFormEl.append(getInitialsEl, createInputEl, createSubmitBtnEl);
     endQuizContainerEl.appendChild(createFormEl);
-};
+// end of getUserInitials function
+}
 
 // checks if it is the end of the quiz and if so gives user info
 var endQuiz = function () {
@@ -308,8 +358,6 @@ var endQuiz = function () {
 
     containerEl.appendChild(endQuizContainerEl);
     
-  
-
 // end of endQuiz function
 }
 
