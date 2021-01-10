@@ -23,36 +23,36 @@ var testInfo = {
                     "Arrays in JavaScript can be used to store",
                     "The condition in an if / else statement is enclosed with _______",
                     "A very useful tool during development and debugging for printing content to the debugger is"],
-    testAnswerA: ["commas", 
-                    "strings", 
-                    "numbers and strings",
-                    "quotes",
-                    "JavaScript"],
-    testAnswerB: ["curly brackets", 
-                    "booleans", 
-                    "other arrays",
-                    "curly brackets",
-                    "terminal/bash"],
-    testAnswerC: ["quotes", 
-                    "alerts", 
-                    "booleans",
-                    "parenthesis",
-                    "for loops"],
-    testAnswerD: ["parenthesis", 
-                    "numbers", 
-                    "all of the above",
-                    "square brackets",
-                    "console.log"],
+    testAnswer1: ["1. commas", 
+                    "1. strings", 
+                    "1. numbers and strings",
+                    "1. quotes",
+                    "1. JavaScript"],
+    testAnswer2: ["2. curly brackets", 
+                    "2. booleans", 
+                    "2. other arrays",
+                    "2. curly brackets",
+                    "2. terminal/bash"],
+    testAnswer3: ["3. quotes", 
+                    "3. alerts", 
+                    "3. booleans",
+                    "3. parenthesis",
+                    "3. for loops"],
+    testAnswer4: ["4. parenthesis", 
+                    "4. numbers", 
+                    "4. all of the above",
+                    "4. square brackets",
+                    "4. console.log"],
     testAnswerUser: ["",
                     "",
                     "",
                     "",
                     ""],
-    testAnswerActual: ["c",
-                    "c",
-                    "d",
-                    "d",
-                    "d"]
+    testAnswerActual: ["3",
+                    "3",
+                    "4",
+                    "3",
+                    "4"]
 };
 
 // presents high scores when user clicks button
@@ -101,6 +101,7 @@ var userPrompt = function() {
 
 // checks user answer against actual answer and checks if out of time for answer
 var checkAnswer = function() {
+    console.log(testInfo.testAnswerActual[questionIndex], testInfo.testAnswerUser[questionIndex])
     if (testInfo.testAnswerActual[questionIndex] === testInfo.testAnswerUser[questionIndex] && seconds>0) {
         return true;
     } else  if (seconds<=0) {
@@ -248,38 +249,15 @@ var endQuiz = function () {
 var getAnswer = function(event) {
     event.preventDefault();
 
-    console.log(event.Target);
-
-    // checks which answer the user chose
-    var answerA = document.getElementById("answer-a").clicked;
-    var answerB = document.getElementById("answer-b").clicked;
-    var answerC = document.getElementById("answer-c").clicked;
-    var answerD = document.getElementById("answer-d").clicked;
-
-    if (document.getElementById("answer-a").clicked == true) {
-        console.log("I am in")
-    }
-
-    console.log(answerA, answerB, answerC, answerD);
-
     // correct notes whether the user got the answer correct
-    var correct;
-
+    var correct = false;
+    
+    
     // puts the user answer in the testInfo object
-    if (answerA) {
-        testInfo.testAnswerUser[questionIndex] = "a";
-    } else if (answerB){
-        testInfo.testAnswerUser[questionIndex] = "b";
-    } else if (answerC) {
-        testInfo.testAnswerUser[questionIndex] = "c";
-    } else if (answerD) {
-        testInfo.testAnswerUser[questionIndex] = "d;"
-    }
+    testInfo.testAnswerUser[questionIndex] = event.target.id.slice(7);
 
-    // checks if a radio box has been chosen
-    if (!(answerA || answerB || answerC)) {
-        window.alert("You need to submit an answer");
-    } else if (questionIndex < (testInfo.testQuestions.length)) {
+
+    if (questionIndex < (testInfo.testQuestions.length)) {
         // checks the user answer against the actual answer
         correct = checkAnswer(questionIndex);
         keepScore(correct);
@@ -316,32 +294,27 @@ var createTestQuestions = function(event) {
     formEl.id = "question-form";
 
     containerEl.appendChild(formEl);
-
-    var answerArray = ['a', 'b', 'c', 'd'];
     
     // create radio buttons for answers A, B and C as loop through answerArray
-    for (j = 0; j < (answerArray.length); j++) {
+    for (j = 1; j < (testInfo.testQuestions.length); j++) {
         
         // creates  button for each question
         var answerBtnWrapperEl = document.createElement("div");
         answerBtnWrapperEl.id = "answer-button";
 
         var answerBtnEl = document.createElement("button")
-        answerBtnEl.id = "answer-" + answerArray[j];
+        answerBtnEl.id = "answer-" + j.toString();
         answerBtnEl.name = "answer-button";
         
-        answerBtnEl.value = "answer-" + answerArray[j];
+        answerBtnEl.value = "answer-" + j.toString();
         answerBtnEl.setAttribute("onclick", "getAnswer(event)");
-        answerBtnEl.textContent = eval('testInfo.testAnswer' + answerArray[j].toUpperCase() + '[questionIndex]');
+        answerBtnEl.textContent = eval('testInfo.testAnswer' + j.toString() + '[questionIndex]');
 
         // puts the answer choices (radio buttons and labels) into the html
         answerBtnWrapperEl.appendChild(answerBtnEl);
         formEl.appendChild(answerBtnWrapperEl);
     } 
-    //console.log(formEl);
-    //var getAnswerBtn = formEl.querySelector("question-form");
-    //console.log("get Answer button:", getAnswerBtn);
-    //getAnswerBtn.addEventListener("click", getAnswer);
+
 // end of createTestQuestions function
 };
 
