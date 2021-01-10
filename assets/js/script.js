@@ -88,20 +88,8 @@ var createClearWindow = function () {
     return containerEl;
 }
 
-// prompts for user initials
-var userPrompt = function() {
-    // to accomodate all name types only an empty string is rejected as name initials
-    userInfo.userInitials = window.prompt("Welcome to your Code Quiz Challenge! Please enter your initials.");
-    if (!userInfo.userInitials) {
-        window.alert("You have not entered anything. Please try again.");
-        userPrompt();
-    };
-   
-};
-
 // checks user answer against actual answer and checks if out of time for answer
 var checkAnswer = function() {
-    console.log(testInfo.testAnswerActual[questionIndex], testInfo.testAnswerUser[questionIndex])
     if (testInfo.testAnswerActual[questionIndex] === testInfo.testAnswerUser[questionIndex] && seconds>0) {
         return true;
     } else  if (seconds<=0) {
@@ -117,11 +105,9 @@ var keepScore = function(correct) {
     switch (correct) {
         case true:
             userInfo.userScore++;
-            window.alert("Correct! Score = " + userInfo.userScore);
             break;
         case false:
             seconds -= 10;
-            window.alert("Inorrect. 10 seconds have been deducted from your time. Score = " + userInfo.userScore);
             break;
         default:
           console.log("Something went wrong!");
@@ -143,6 +129,7 @@ var saveHighScore = function(event) {
 
 // checking if this is the user's high score
 var checkHighScores = function() {
+
     // get high scores array saved on LocalStorage
     var savedHighScores = localStorage.getItem("highScores");
     var updatedSavedHighScores = [];
@@ -181,18 +168,47 @@ var checkHighScores = function() {
 
 // end of checkHighScore function
 }
+var clearFooterAnswer = function () {
+    var answerRevealedEl = document.querySelector("#answer-reveal");
+    answerRevealedEl.textContent = '';
+}
+
+var answerReveal = function(correct) {
+    var quizContainerEl = document.querySelector("#quiz-container");
+    if (questionIndex === 0) {
+        var answerRevealEl = document.createElement("h2");
+        answerRevealEl.id = "answer-reveal";
+    } else {
+        clearFooterAnswer();
+        var answerRevealEl = document.querySelector("#answer-reveal");
+    }
+    
+    if (correct) {
+        answerRevealEl.textContent = "Correct!";
+    } else {
+        answerRevealEl.textContent = "Wrong!";
+    }
+    
+    if (questionIndex === 0) {
+        quizContainerEl.appendChild(answerRevealEl);
+    } 
+    
+}
 
 // puts the high score info on the page if user achieved a high score
-var highScoreInfo = function (containerEl) {
+var highScoreInfo = function () {
 
     // check if user had high score and temporarily save in highScores array
     // knowing user can decide to not store in localStorage
     checkHighScores();
 
+    // clears out window so can put quiz results up
+    refresh(refreshWindowEl);
+
     if (userInfo.isUserHighScore) {
         var quizHighScoreEl = document.createElement("h2");
         quizHighScoreEl.textContent = "This is your high Score!";
-        containerEl.appendChild(quizHighScoreEl);
+        endQuizContainerEl.appendChild(quizHighScoreEl);
 
         var saveHighScoreBtn = document.createElement("button");
         saveHighScoreBtn.id = 'save-high-score-btn';
@@ -201,11 +217,49 @@ var highScoreInfo = function (containerEl) {
 
         // saveHighScore function called if user clicks button to save high score
         saveHighScoreBtn.setAttribute("onclick", "saveHighScore(event)");
-        containerEl.appendChild(saveHighScoreBtn);
+        endQuizContainerEl.appendChild(saveHighScoreBtn);
     }
+    
 // end of highScoreInfo function
 }
 
+var storeUserInitials = function(event) {
+    event.preventDefault();
+
+    userInfo.userInitials = document.getElementById("initials-input").value;
+
+    highScoreInfo();
+}
+
+// prompts for user initials as a form with a submit button
+var getUserInitials = function(endQuizContainerEl) {
+    
+    var createFormEl = document.createElement("form");
+    createFormEl.id = "initials-form";
+    
+    var getInitialsEl = document.createElement("label");
+    getInitialsEl.id="initials-label";
+    getInitialsEl.setAttribute("type", "text");
+    getInitialsEl.setAttribute("for", "initials");
+    getInitialsEl.textContent = "Enter initials:";
+
+    var createInputEl = document.createElement("input");
+    createInputEl.type="text";
+    createInputEl.setAttribute("placeholder", "Your Initials");
+    createInputEl.name = "initials"
+    createInputEl.id = "initials-input";
+
+    var createSubmitBtnEl = document.createElement("button");
+    createSubmitBtnEl.type = "submit";
+    createSubmitBtnEl.setAttribute("onclick", "storeUserInitials(event)");
+    createSubmitBtnEl.textContent = "Submit";
+    createSubmitBtnEl.id = "initials-submit-btn";
+    
+    createFormEl.append(getInitialsEl, createInputEl, createSubmitBtnEl);
+    endQuizContainerEl.appendChild(createFormEl);
+};
+
+// checks if it is the end of the quiz and if so gives user info
 var endQuiz = function () {
 
     // initializes that user finished quiz to true;
@@ -221,26 +275,40 @@ var endQuiz = function () {
    
     // clears out window so can put quiz results up
     refresh(refreshWindowEl);
+    clearFooterAnswer();
     
     // create div container in a cleared out window to end of quiz info
     var containerEl = createClearWindow();
     containerEl.id = "quiz-summary";
 
+    var endQuizContainerEl = document.createElement("div")
+    endQuizContainerEl.id = "end-quiz-container";
+
     var quizEndMessageEl = document.createElement("h1");
     if (quizFinish) { 
-        quizEndMessageEl.textContent = "End of Quiz!"; 
+        quizEndMessageEl.textContent = "All done!"; 
     }
     else { 
         quizEndMessageEl.textContent = "Time is up!"
     }
 
-    containerEl.appendChild(quizEndMessageEl);
+    endQuizContainerEl.appendChild(quizEndMessageEl);
 
     var quizSummaryEl = document.createElement("h2");
-    quizSummaryEl.textContent = "\'" + userInfo.userInitials + "\'" + " has a score of " + userInfo.userScore + " and finished with " + seconds + " seconds to spare";
-    containerEl.appendChild(quizSummaryEl);
+    if (seconds === 1) {
+        var secondsText = "second";
+    } else  { 
+        var secondsText = "seconds";
+    }
 
-    highScoreInfo(containerEl);
+    quizSummaryEl.textContent =  "Your final score is " + userInfo.userScore + " and you finished with " + seconds + " " + secondsText + " to spare.";
+    endQuizContainerEl.appendChild(quizSummaryEl);
+    
+    getUserInitials(endQuizContainerEl);
+
+    containerEl.appendChild(endQuizContainerEl);
+    
+  
 
 // end of endQuiz function
 }
@@ -260,6 +328,9 @@ var getAnswer = function(event) {
     if (questionIndex < (testInfo.testQuestions.length)) {
         // checks the user answer against the actual answer
         correct = checkAnswer(questionIndex);
+
+        answerReveal(correct);
+
         keepScore(correct);
         questionIndex++;
     } 
@@ -281,6 +352,8 @@ var createTestQuestions = function(event) {
 
     // create div container in a cleared out window to hold question and form
     var containerEl = createClearWindow();
+
+    containerEl.id = 'window-container-test-questions';
     
     // create question in h3
     var questionEl = document.createElement("h2");
